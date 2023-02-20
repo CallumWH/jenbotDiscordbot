@@ -1,5 +1,10 @@
 package org.example.discord;
 
+import com.bernardomg.tabletop.dice.history.RollHistory;
+import com.bernardomg.tabletop.dice.interpreter.DiceInterpreter;
+import com.bernardomg.tabletop.dice.interpreter.DiceRoller;
+import com.bernardomg.tabletop.dice.parser.DefaultDiceParser;
+import com.bernardomg.tabletop.dice.parser.DiceParser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -50,6 +55,9 @@ public class DiscordListener extends ListenerAdapter {
             case "repeat":
                 event.reply("**REPEAT** " + (musicHandler.toggleRepeat() ? "**ENABLED**" : "**DISABLED**")).queue();
                 break;
+            case "roll":
+                event.reply(diceRoller(event.getOption("dice", OptionMapping::getAsString))).queue();
+                break;
         }
     }
 
@@ -58,10 +66,10 @@ public class DiscordListener extends ListenerAdapter {
         StringJoiner stringJoiner = new StringJoiner(", ");
         int total = 0;
 
-//        if(event.getMember().getUser().getId().equals("71998253645697024")) {
-//            return "GLORIOUS 8d6 FIRE DAMAGE!: 6, 6, 6, 6, 6, 6\n**Total** : 36 fire damage! :fire:\n**NOW THAT'S A FIREBALL! J'EN IS PLEASED!**";
-//        }
-        for (int i = 0; i < 6; i++) {
+        if(event.getMember().getUser().getId().equals("71998253645697024")) {
+            return "6, 6, 6, 6, 6, 6, 6, 6\n**Total** : 48 fire damage! :fire:\n**NOW THAT'S A FIREBALL! J'EN IS PLEASED!**";
+        }
+        for (int i = 0; i < 8; i++) {
             int d6 = random.nextInt(1, 7);
             total += d6;
             stringJoiner.add(new String("" + d6));
@@ -72,12 +80,29 @@ public class DiscordListener extends ListenerAdapter {
             damageString = damageString + "\n*Fucking weak ass fireball*";
         }
 
-        if (total == 36) {
+        if (total >= 36) {
             damageString = damageString + "\n**NOW THAT'S A FIREBALL! J'EN IS PLEASED!**";
         }
 
         return damageString;
     }
+    public String diceRoller(String diceCommand) {
+        final DiceParser parser;
+        final RollHistory rolls;
+        final DiceInterpreter<RollHistory> roller;
+
+        diceCommand = diceCommand.replaceAll("\\s+","");
+
+        parser = new DefaultDiceParser();
+        roller = new DiceRoller();
+
+        try {
+            rolls = parser.parse(diceCommand, roller);
+        } catch (Exception e) {
+            return "Heeeeeeey, keep it simple >:(";
+        }
 
 
+        return new String("**Rolling! : " + diceCommand +"**\n" + rolls.toString() + "\nTotal : " + rolls.getTotalRoll());
+    }
 }
