@@ -15,13 +15,17 @@ public class TrackScheduler extends AudioEventAdapter {
     private boolean repeat = false;
     private List<AudioTrack> trackQueue = new ArrayList<>();
 
-    public TrackScheduler(AudioPlayer player) {
+    private MusicHandler musicHandler;
+
+    public TrackScheduler(AudioPlayer player, MusicHandler musicHandler) {
+        this.musicHandler = musicHandler;
         this.player = player;
     }
 
     public void queue(AudioTrack audioTrack) {
         if (trackQueue.isEmpty()) {
             player.playTrack(audioTrack);
+            musicHandler.nowPlaying(audioTrack.getInfo().title);
         }
         trackQueue.add(audioTrack);
     }
@@ -31,10 +35,12 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     private void playNext() {
+        AudioTrack topTrack = trackQueue.get(0);
         if(!repeat) {
-            player.playTrack(trackQueue.get(0));
+            player.playTrack(topTrack);
+            musicHandler.nowPlaying(topTrack.getInfo().title);
         } else {
-            player.playTrack(trackQueue.get(0).makeClone());
+            player.playTrack(topTrack.makeClone());
         }
 
     }
@@ -102,6 +108,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
+        System.out.println(exception);
         // An already playing track threw an exception (track end event will still be received separately)
     }
 

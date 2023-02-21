@@ -5,6 +5,7 @@ import com.bernardomg.tabletop.dice.interpreter.DiceInterpreter;
 import com.bernardomg.tabletop.dice.interpreter.DiceRoller;
 import com.bernardomg.tabletop.dice.parser.DefaultDiceParser;
 import com.bernardomg.tabletop.dice.parser.DiceParser;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -40,8 +41,13 @@ public class DiscordListener extends ListenerAdapter {
                 event.reply("<@72012326802300928> ILLIDAAAAAAAAAAAN!!!!").queue();
                 break;
             case "play":
+                String url = event.getOption("url", OptionMapping::getAsString);
+                if(null == url) {
+                    event.reply("You need to send a url dummy!").queue();
+                    break;
+                }
                 try {
-                    musicHandler.playMusic(event.getOption("url", OptionMapping::getAsString), event);
+                    musicHandler.playMusic(url, event);
                 } catch (UserNotInVoiceException e) {
                     event.reply("HEY " + event.getMember().getAsMention() + " YOU NEED TO JOIN VOICE TO DO THAT!").queue();
                     break;
@@ -86,6 +92,11 @@ public class DiscordListener extends ListenerAdapter {
                 }
 
         }
+    }
+
+    @Override
+    public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
+        musicHandler.checkChannelPopulation(event);
     }
 
     private String doFireball(SlashCommandInteractionEvent event) {

@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.example.model.exceptions.UserNotInVoiceException;
@@ -27,7 +28,7 @@ public class MusicHandler {
         audioPlayerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         player = audioPlayerManager.createPlayer();
-        trackScheduler = new TrackScheduler(player);
+        trackScheduler = new TrackScheduler(player, this);
         player.addListener(trackScheduler);
     }
 
@@ -50,12 +51,11 @@ public class MusicHandler {
         } else {
             verifyCallingUserIsInSameVoice(event);
         }
-
         audioPlayerManager.loadItem(query, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
                 trackScheduler.queue(audioTrack);
-                returnPlayingTrack(audioTrack.getInfo().title, event);
+                returnQueuedTrack(audioTrack.getInfo().title, event);
             }
 
             @Override
@@ -104,7 +104,7 @@ public class MusicHandler {
         trackScheduler.skipTrack();
     }
 
-    private void returnPlayingTrack(String info, SlashCommandInteractionEvent event) {
+    private void returnQueuedTrack(String info, SlashCommandInteractionEvent event) {
         event.reply("**Track Queued : **" + info).queue();
     }
 
@@ -116,5 +116,17 @@ public class MusicHandler {
         if(null == event.getMember().getVoiceState().getChannel().asVoiceChannel() || audioManager.getConnectedChannel().asVoiceChannel() != event.getMember().getVoiceState().getChannel().asVoiceChannel()) {
             throw new UserNotInVoiceException("user needs to be in the bots voice channel to execute this command");
         }
+    }
+    public void checkChannelPopulation(GuildVoiceUpdateEvent event){
+        if(null != audioManager) {
+            if(audioManager.getConnectedChannel().asVoiceChannel().getMembers().size() < 2) {
+                event.getGuild().getTextChannelById("493537895404273674").sendMessage("**No users remain in channel : " + audioManager.getConnectedChannel().getAsMention() + " Disconnecting**").queue();
+                leaveVoice();
+            }
+        }
+    }
+
+    public void nowPlaying(String trackName) {
+        audioManager.getJDA().getTextChannelById("493537895404273674").sendMessage("**Now playing...**\n" +  trackName).queue();
     }
 }

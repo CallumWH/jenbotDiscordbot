@@ -15,7 +15,7 @@ public class Main {
         // We don't need any intents for this bot. Slash commands work without any intents!
         JDA jda = JDABuilder.createDefault(BOT_TOKEN)
                 .addEventListeners(new DiscordListener())
-                .setActivity(Activity.playing("with Veldris"))
+                .setActivity(Activity.playing("with Veldriss"))
                 .build();
 
         // Sets the global command list to the provided commands (removing all others)
@@ -30,6 +30,7 @@ public class Main {
                 Commands.slash("roll", "ROLL THE BONES AND DECIDE THY FATE").addOption(OptionType.STRING, "dice", "Dice to roll, supports #d# + #. modifier expressions (8d6!, 8d6kh2, 8d6d2 etc) not supported"),
                 Commands.slash("leave", "BEGONE CAT")
         ).queue();
+
     }
 
 }
