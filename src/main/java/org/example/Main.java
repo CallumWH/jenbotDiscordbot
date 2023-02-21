@@ -27,7 +27,8 @@ public class Main {
                 Commands.slash("queue", "get the current music queue"),
                 Commands.slash("skip", "skip current track"),
                 Commands.slash("repeat", "enable repeat mode"),
-                Commands.slash("roll", "ROLL THE BONES AND DECIDE THY FATE").addOption(OptionType.STRING, "dice", "Dice to roll, supports #d# + #. modifier expressions (8d6!, 8d6kh2, 8d6d2 etc) not supported")
+                Commands.slash("roll", "ROLL THE BONES AND DECIDE THY FATE").addOption(OptionType.STRING, "dice", "Dice to roll, supports #d# + #. modifier expressions (8d6!, 8d6kh2, 8d6d2 etc) not supported"),
+                Commands.slash("leave", "BEGONE CAT")
         ).queue();
     }
 

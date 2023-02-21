@@ -8,6 +8,7 @@ import com.bernardomg.tabletop.dice.parser.DiceParser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.example.model.exceptions.UserNotInVoiceException;
 
 import java.util.Random;
 import java.util.StringJoiner;
@@ -39,17 +40,32 @@ public class DiscordListener extends ListenerAdapter {
                 event.reply("<@72012326802300928> ILLIDAAAAAAAAAAAN!!!!").queue();
                 break;
             case "play":
-                musicHandler.playMusic(event.getOption("url", OptionMapping::getAsString), event);
+                try {
+                    musicHandler.playMusic(event.getOption("url", OptionMapping::getAsString), event);
+                } catch (UserNotInVoiceException e) {
+                    event.reply("HEY " + event.getMember().getAsMention() + " YOU NEED TO JOIN VOICE TO DO THAT!").queue();
+                    break;
+                }
                 break;
             case "stop":
-                musicHandler.stopMusic();
+                try {
+                    musicHandler.stopMusic(event);
+                } catch (UserNotInVoiceException e) {
+                    event.reply("HEY " + event.getMember().getAsMention() + " YOU NEED TO JOIN VOICE TO DO THAT!").queue();
+                    break;
+                }
                 event.reply(event.getMember().getAsMention() + " has stopped play and cleared the queue").queue();
                 break;
             case "queue":
                 event.reply(musicHandler.getMusicQueue()).queue();
                 break;
             case "skip":
-                musicHandler.skipTrack(event);
+                try {
+                    musicHandler.skipTrack(event);
+                } catch (UserNotInVoiceException e) {
+                    event.reply("HEY " + event.getMember().getAsMention() + " YOU NEED TO JOIN VOICE TO DO THAT!").queue();
+                    break;
+                }
                 event.reply(event.getMember().getAsMention() + " has skipped the current track").queue();
                 break;
             case "repeat":
@@ -58,6 +74,17 @@ public class DiscordListener extends ListenerAdapter {
             case "roll":
                 event.reply(diceRoller(event.getOption("dice", OptionMapping::getAsString))).queue();
                 break;
+            case "leave":
+                try {
+                    musicHandler.stopMusic(event);
+                    musicHandler.leaveVoice();
+                    event.reply("bye!").queue();
+                    break;
+                } catch (UserNotInVoiceException e) {
+                    event.reply("HEY " + event.getMember().getAsMention() + " YOU NEED TO JOIN VOICE TO DO THAT!").queue();
+                    break;
+                }
+
         }
     }
 
@@ -66,7 +93,7 @@ public class DiscordListener extends ListenerAdapter {
         StringJoiner stringJoiner = new StringJoiner(", ");
         int total = 0;
 
-        if(event.getMember().getUser().getId().equals("71998253645697024")) {
+        if (event.getMember().getUser().getId().equals("71998253645697024")) {
             return "6, 6, 6, 6, 6, 6, 6, 6\n**Total** : 48 fire damage! :fire:\n**NOW THAT'S A FIREBALL! J'EN IS PLEASED!**";
         }
         for (int i = 0; i < 8; i++) {
@@ -86,12 +113,13 @@ public class DiscordListener extends ListenerAdapter {
 
         return damageString;
     }
+
     public String diceRoller(String diceCommand) {
         final DiceParser parser;
         final RollHistory rolls;
         final DiceInterpreter<RollHistory> roller;
 
-        diceCommand = diceCommand.replaceAll("\\s+","");
+        diceCommand = diceCommand.replaceAll("\\s+", "");
 
         parser = new DefaultDiceParser();
         roller = new DiceRoller();
@@ -103,6 +131,6 @@ public class DiscordListener extends ListenerAdapter {
         }
 
 
-        return new String("**Rolling! : " + diceCommand +"**\n" + rolls.toString() + "\nTotal : " + rolls.getTotalRoll());
+        return new String("**Rolling! : " + diceCommand + "**\n" + rolls.toString() + "\nTotal : " + rolls.getTotalRoll());
     }
 }

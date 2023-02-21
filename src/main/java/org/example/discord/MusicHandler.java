@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.example.model.exceptions.UserNotInVoiceException;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -38,9 +39,16 @@ public class MusicHandler {
         return connectedChannel.getAsMention();
     }
 
-    public void playMusic(String query, SlashCommandInteractionEvent event) {
+    public void leaveVoice() {
+        audioManager.closeAudioConnection();
+        audioManager = null;
+    }
+
+    public void playMusic(String query, SlashCommandInteractionEvent event) throws UserNotInVoiceException {
         if(null == audioManager) {
             joinVoice(event);
+        } else {
+            verifyCallingUserIsInSameVoice(event);
         }
 
         audioPlayerManager.loadItem(query, new AudioLoadResultHandler() {
@@ -82,7 +90,8 @@ public class MusicHandler {
         return stringJoiner.toString();
     }
 
-    public void stopMusic() {
+    public void stopMusic(SlashCommandInteractionEvent event) throws UserNotInVoiceException {
+        verifyCallingUserIsInSameVoice(event);
         trackScheduler.clearTrackList();
     }
 
@@ -90,10 +99,22 @@ public class MusicHandler {
         return trackScheduler.toggleRepeat();
     }
 
-    public void skipTrack(SlashCommandInteractionEvent event) {
+    public void skipTrack(SlashCommandInteractionEvent event) throws UserNotInVoiceException {
+        verifyCallingUserIsInSameVoice(event);
         trackScheduler.skipTrack();
     }
+
     private void returnPlayingTrack(String info, SlashCommandInteractionEvent event) {
         event.reply("**Track Queued : **" + info).queue();
+    }
+
+    private void verifyCallingUserIsInSameVoice(SlashCommandInteractionEvent event) throws UserNotInVoiceException {
+
+        if(null == event.getMember().getVoiceState().getChannel() || null == audioManager) {
+            throw new UserNotInVoiceException("user needs to be in the bots voice channel to execute this command");
+        }
+        if(null == event.getMember().getVoiceState().getChannel().asVoiceChannel() || audioManager.getConnectedChannel().asVoiceChannel() != event.getMember().getVoiceState().getChannel().asVoiceChannel()) {
+            throw new UserNotInVoiceException("user needs to be in the bots voice channel to execute this command");
+        }
     }
 }
