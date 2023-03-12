@@ -15,7 +15,7 @@ public class Main {
         // We don't need any intents for this bot. Slash commands work without any intents!
         JDA jda = JDABuilder.createDefault(BOT_TOKEN)
                 .addEventListeners(new DiscordListener())
-                .setActivity(Activity.playing("with Veldriss"))
+                .setActivity(Activity.playing("Lancer"))
                 .build();
 
         // Sets the global command list to the provided commands (removing all others)
@@ -24,11 +24,13 @@ public class Main {
                 Commands.slash("drow", "Summon the drow!"),
                 Commands.slash("play", "play music").addOption(OptionType.STRING, "url", "youtube url"),
                 Commands.slash("stop", "shut Jen up"),
-                Commands.slash("queue", "get the current music queue"),
+                Commands.slash("queue", "get the current music queue").addOption(OptionType.INTEGER, "page", "queue page number"),
                 Commands.slash("skip", "skip current track"),
                 Commands.slash("repeat", "enable repeat mode"),
                 Commands.slash("roll", "ROLL THE BONES AND DECIDE THY FATE").addOption(OptionType.STRING, "dice", "Dice to roll, supports #d# + #. modifier expressions (8d6!, 8d6kh2, 8d6d2 etc) not supported"),
-                Commands.slash("leave", "BEGONE CAT")
+                Commands.slash("leave", "BEGONE CAT"),
+                Commands.slash("join", "Summon the cat"),
+                Commands.slash("shuffle", "do the shuffle, do be do do do do...")
         ).queue();
 
     }

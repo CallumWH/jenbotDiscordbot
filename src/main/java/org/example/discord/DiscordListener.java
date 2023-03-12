@@ -5,14 +5,18 @@ import com.bernardomg.tabletop.dice.interpreter.DiceInterpreter;
 import com.bernardomg.tabletop.dice.interpreter.DiceRoller;
 import com.bernardomg.tabletop.dice.parser.DefaultDiceParser;
 import com.bernardomg.tabletop.dice.parser.DiceParser;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.example.model.exceptions.UserNotInVoiceException;
 
 import java.util.Random;
 import java.util.StringJoiner;
+
+import static org.example.discord.MusicHandler.BOT_ID;
 
 public class DiscordListener extends ListenerAdapter {
 
@@ -63,7 +67,13 @@ public class DiscordListener extends ListenerAdapter {
                 event.reply(event.getMember().getAsMention() + " has stopped play and cleared the queue").queue();
                 break;
             case "queue":
-                event.reply(musicHandler.getMusicQueue()).queue();
+
+                try {
+                    event.reply(musicHandler.getMusicQueue(event.getOption("page", OptionMapping::getAsInt))).queue();
+                } catch (NullPointerException | ArithmeticException e) {
+                    event.reply(musicHandler.getMusicQueue(1)).queue();
+                }
+
                 break;
             case "skip":
                 try {
@@ -90,7 +100,12 @@ public class DiscordListener extends ListenerAdapter {
                     event.reply("HEY " + event.getMember().getAsMention() + " YOU NEED TO JOIN VOICE TO DO THAT!").queue();
                     break;
                 }
-
+            case "join":
+                event.reply("Joined : " + musicHandler.joinVoice(event)).setEphemeral(true).queue(null, e -> System.out.println(e.getLocalizedMessage()));
+                break;
+            case "shuffle":
+                musicHandler.shuffle();
+                event.reply("***DOES THE SHUFFLE***").setEphemeral(false).queue();
         }
     }
 
@@ -104,9 +119,9 @@ public class DiscordListener extends ListenerAdapter {
         StringJoiner stringJoiner = new StringJoiner(", ");
         int total = 0;
 
-        if (event.getMember().getUser().getId().equals("71998253645697024")) {
-            return "6, 6, 6, 6, 6, 6, 6, 6\n**Total** : 48 fire damage! :fire:\n**NOW THAT'S A FIREBALL! J'EN IS PLEASED!**";
-        }
+//        if (event.getMember().getUser().getId().equals("71998253645697024")) {
+//            return "6, 6, 6, 6, 6, 6, 6, 6\n**Total** : 48 fire damage! :fire:\n**NOW THAT'S A FIREBALL! J'EN IS PLEASED!**";
+//        }
         for (int i = 0; i < 8; i++) {
             int d6 = random.nextInt(1, 7);
             total += d6;
