@@ -9,19 +9,22 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.example.model.exceptions.UserNotInVoiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.StringJoiner;
 
 import static org.example.discord.MusicHandler.BOT_ID;
-
 public class DiscordListener extends ListenerAdapter {
 
-    public static final String BOT_TOKEN = "MTA3NzAwNTcxNzk5NjgzODkxMg.GQVngh.2aI2UeKg0xLt_6zTIAiSqz4vIGytZh1XJcAYMo";
+    public static final String BOT_TOKEN = "ACCESS_TOKEN";
     private MusicHandler musicHandler;
+    private static final Logger logger = LoggerFactory.getLogger(DiscordListener.class);;
 
     public DiscordListener() {
         musicHandler = new MusicHandler();

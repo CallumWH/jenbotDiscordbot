@@ -40,13 +40,12 @@ public class MusicHandler {
     public String joinVoice(SlashCommandInteractionEvent event) {
         VoiceChannel connectedChannel = event.getMember().getVoiceState().getChannel().asVoiceChannel();
         audioManager = event.getGuild().getAudioManager();
-
+        audioManager.setSendingHandler(new AudioPlayerSendHandler(player));
         try {
             audioManager.openAudioConnection(connectedChannel);
         } catch (Exception e) {
             System.out.println(e);
         }
-        audioManager.setSendingHandler(new AudioPlayerSendHandler(player));
         return connectedChannel.getAsMention();
     }
 
