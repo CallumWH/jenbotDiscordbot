@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TrackScheduler extends AudioEventAdapter {
@@ -15,15 +16,39 @@ public class TrackScheduler extends AudioEventAdapter {
     private boolean repeat = false;
     private List<AudioTrack> trackQueue = new ArrayList<>();
 
-    public TrackScheduler(AudioPlayer player) {
+    private MusicHandler musicHandler;
+
+    public TrackScheduler(AudioPlayer player, MusicHandler musicHandler) {
+        this.musicHandler = musicHandler;
         this.player = player;
     }
 
-    public void queue(AudioTrack audioTrack) {
+    public void queue(AudioTrack audioTrack, boolean skip) {
         if (trackQueue.isEmpty()) {
             player.playTrack(audioTrack);
+            musicHandler.nowPlaying(audioTrack.getInfo().title);
         }
-        trackQueue.add(audioTrack);
+
+        if(skip) {
+            List<AudioTrack> temp = new ArrayList<>();
+            temp.add(audioTrack);
+            if(!trackQueue.isEmpty()) {
+                temp.add(trackQueue.get(0).makeClone());
+                trackQueue.remove(0);
+            }
+            temp.addAll(trackQueue);
+            trackQueue = temp;
+            playNext();
+        } else {
+            trackQueue.add(audioTrack);
+        }
+    }
+
+    public void shuffle() {
+        AudioTrack topTrack = trackQueue.get(0);
+        Collections.shuffle(trackQueue);
+        int topTrackIndex = trackQueue.indexOf(topTrack);
+        Collections.swap(trackQueue, topTrackIndex, 0);
     }
 
     public List<AudioTrack> getQueue() {
@@ -31,10 +56,12 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     private void playNext() {
-        if(!repeat) {
-            player.playTrack(trackQueue.get(0));
+        AudioTrack topTrack = trackQueue.get(0);
+        if (!repeat) {
+            player.playTrack(topTrack);
+            musicHandler.nowPlaying(topTrack.getInfo().title);
         } else {
-            player.playTrack(trackQueue.get(0).makeClone());
+            player.playTrack(topTrack.makeClone());
         }
 
     }
@@ -45,21 +72,25 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void skipTrack() {
-        trackQueue.remove(player.getPlayingTrack());
         player.stopTrack();
 
-        if(!trackQueue.isEmpty()) {
+        if (!trackQueue.isEmpty()) {
+            trackQueue.remove(0);
+        }
+
+        if (!trackQueue.isEmpty()) {
             playNext();
         }
     }
 
     public boolean toggleRepeat() {
-        if(repeat) {
+        if (repeat) {
             return repeat = false;
         } else {
             return repeat = true;
         }
     }
+
     @Override
     public void onPlayerPause(AudioPlayer player) {
         // Player was paused
@@ -80,7 +111,7 @@ public class TrackScheduler extends AudioEventAdapter {
         System.out.println("Audio ended - " + endReason);
         if (endReason == AudioTrackEndReason.FINISHED) {
 
-            if(!repeat) {
+            if (!repeat) {
                 trackQueue.remove(track);
             }
             if (!trackQueue.isEmpty()) {
@@ -88,7 +119,7 @@ public class TrackScheduler extends AudioEventAdapter {
             }
         }
 
-        if(endReason == AudioTrackEndReason.LOAD_FAILED) {
+        if (endReason == AudioTrackEndReason.LOAD_FAILED) {
             System.out.println(endReason);
         }
 
@@ -102,12 +133,19 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
+        System.out.println(exception.fillInStackTrace());
+        retryPlayTrack(track);
         // An already playing track threw an exception (track end event will still be received separately)
     }
 
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         // Audio track has been unable to provide us any audio, might want to just start a new track
+    }
+
+    public void retryPlayTrack(AudioTrack track) {
+        player.playTrack(track.makeClone());
+        System.out.println("attempting to retry playing audio track [" + track.getInfo() + "]");
     }
 
 }
