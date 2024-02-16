@@ -58,7 +58,7 @@ public class MusicHandler {
         trackScheduler.shuffle();
     }
 
-    public void playMusic(String query, SlashCommandInteractionEvent event) throws UserNotInVoiceException {
+    public void playMusic(String query, SlashCommandInteractionEvent event, boolean skip) throws UserNotInVoiceException {
         if (null == audioManager) {
             joinVoice(event);
         } else {
@@ -68,7 +68,7 @@ public class MusicHandler {
         audioPlayerManager.loadItem(query, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
-                trackScheduler.queue(audioTrack);
+                trackScheduler.queue(audioTrack, skip);
                 returnQueuedTrack(audioTrack.getInfo().title, event);
             }
 
@@ -76,7 +76,7 @@ public class MusicHandler {
             public void playlistLoaded(AudioPlaylist audioPlaylist) {
                 event.reply("**Playlist Queued :" + audioPlaylist.getName() + "**\n**Length :" + audioPlaylist.getTracks().size() + "**").queue();
                 for (AudioTrack track : audioPlaylist.getTracks()) {
-                    trackScheduler.queue(track);
+                    trackScheduler.queue(track, skip);
                 }
             }
 
@@ -90,6 +90,10 @@ public class MusicHandler {
                 System.out.println(e);
             }
         });
+    }
+
+    public void jumpQueue() {
+
     }
 
     public String getMusicQueue(int page) {

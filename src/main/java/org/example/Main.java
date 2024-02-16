@@ -36,7 +36,9 @@ public class Main {
                 Commands.slash("roll", "ROLL THE BONES AND DECIDE THY FATE").addOption(OptionType.STRING, "dice", "Dice to roll, supports #d# + #. modifier expressions (8d6!, 8d6kh2, 8d6d2 etc) not supported"),
                 Commands.slash("leave", "BEGONE CAT"),
                 Commands.slash("join", "Summon the cat"),
-                Commands.slash("shuffle", "do the shuffle, do be do do do do...")
+                Commands.slash("shuffle", "do the shuffle, do be do do do do..."),
+                Commands.slash("wildmagic", "ROLL WILDMAGIC!"),
+                Commands.slash("jumpqueue", "plays the given track immediately").addOption(OptionType.STRING, "url", "youtube url")
         ).queue();
 
         Collection<Integer> numbers = Arrays.asList(1, 2, 1, 3);

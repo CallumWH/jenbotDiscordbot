@@ -23,12 +23,25 @@ public class TrackScheduler extends AudioEventAdapter {
         this.player = player;
     }
 
-    public void queue(AudioTrack audioTrack) {
+    public void queue(AudioTrack audioTrack, boolean skip) {
         if (trackQueue.isEmpty()) {
             player.playTrack(audioTrack);
             musicHandler.nowPlaying(audioTrack.getInfo().title);
         }
-        trackQueue.add(audioTrack);
+
+        if(skip) {
+            List<AudioTrack> temp = new ArrayList<>();
+            temp.add(audioTrack);
+            if(!trackQueue.isEmpty()) {
+                temp.add(trackQueue.get(0).makeClone());
+                trackQueue.remove(0);
+            }
+            temp.addAll(trackQueue);
+            trackQueue = temp;
+            playNext();
+        } else {
+            trackQueue.add(audioTrack);
+        }
     }
 
     public void shuffle() {
