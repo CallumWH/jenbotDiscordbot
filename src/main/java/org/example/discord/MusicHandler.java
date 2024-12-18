@@ -4,15 +4,16 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.example.model.AudioSourceManagers;
 import org.example.model.exceptions.UserNotInVoiceException;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.StringJoiner;
 
 public class MusicHandler {
 
+    public static final String YOUTUBE_TOKEN = "YOUTUBE_TOKEN";
     public static final String BOT_ID = "1077005717996838912";
     public static final int QUEUE_PAGE_SIZE = 20;
 
@@ -30,8 +32,10 @@ public class MusicHandler {
 
     public MusicHandler() {
         audioPlayerManager = new DefaultAudioPlayerManager();
-        AudioSourceManagers.registerRemoteSources(audioPlayerManager);
-        audioPlayerManager.registerSourceManager(new LocalAudioSourceManager());
+        YoutubeAudioSourceManager youtubeAudioSourceManager = new dev.lavalink.youtube.YoutubeAudioSourceManager();
+        youtubeAudioSourceManager.useOauth2(YOUTUBE_TOKEN, true);
+        //AudioSourceManagers.registerRemoteSources(audioPlayerManager);
+        audioPlayerManager.registerSourceManager(youtubeAudioSourceManager);
         player = audioPlayerManager.createPlayer();
         trackScheduler = new TrackScheduler(player, this);
         player.addListener(trackScheduler);
