@@ -21,7 +21,6 @@ import java.util.StringJoiner;
 
 public class MusicHandler {
 
-    public static final String YOUTUBE_TOKEN = "YOUTUBE_TOKEN";
     public static final String BOT_ID = "1077005717996838912";
     public static final int QUEUE_PAGE_SIZE = 20;
 

@@ -18,7 +18,6 @@ import java.util.StringJoiner;
 
 public class DiscordListener extends ListenerAdapter {
 
-    public static final String BOT_TOKEN = "BOT TOKEN HERE";
     private MusicHandler musicHandler;
     private static final Logger logger = LoggerFactory.getLogger(DiscordListener.class);
     ;
