@@ -14,10 +14,6 @@ import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceMan
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.yamusic.YandexMusicAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
-import dev.lavalink.youtube.clients.Android;
-import dev.lavalink.youtube.clients.Music;
-import dev.lavalink.youtube.clients.Web;
-import dev.lavalink.youtube.clients.skeleton.Client;
 
 import java.util.Set;
 
@@ -40,7 +36,7 @@ public class AudioSourceManagers {
      * @param containerRegistry Media container registry to be used by any probing sources.
      */
     public static void registerRemoteSources(AudioPlayerManager playerManager, MediaContainerRegistry containerRegistry) {
-        playerManager.registerSourceManager(new dev.lavalink.youtube.YoutubeAudioSourceManager(/*allowSearch:*/ true, new Client[] { new Music(), new Web(), new Android()}));
+        playerManager.registerSourceManager(new YoutubeAudioSourceManager(/*allowSearch:*/));
         playerManager.registerSourceManager(new YandexMusicAudioSourceManager(true));
         playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
         playerManager.registerSourceManager(new BandcampAudioSourceManager());

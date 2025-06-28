@@ -20,8 +20,6 @@ public class DiscordListener extends ListenerAdapter {
 
     private MusicHandler musicHandler;
     private static final Logger logger = LoggerFactory.getLogger(DiscordListener.class);
-    ;
-
     public DiscordListener() {
         musicHandler = new MusicHandler();
     }

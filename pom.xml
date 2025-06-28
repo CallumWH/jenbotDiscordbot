@@ -56,7 +56,7 @@
         <dependency>
             <groupId>dev.lavalink.youtube</groupId>
             <artifactId>common</artifactId>
-            <version>1.12.0</version>
+            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>com.bernardomg.tabletop</groupId>

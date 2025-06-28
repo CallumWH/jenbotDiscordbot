@@ -1,10 +1,8 @@
 package org.example.discord;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -13,7 +11,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
-import org.example.model.AudioSourceManagers;
 import org.example.model.exceptions.UserNotInVoiceException;
 
 import java.util.List;
@@ -31,7 +28,7 @@ public class MusicHandler {
 
     public MusicHandler() {
         audioPlayerManager = new DefaultAudioPlayerManager();
-        YoutubeAudioSourceManager youtubeAudioSourceManager = new dev.lavalink.youtube.YoutubeAudioSourceManager();
+        YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager();
         youtubeAudioSourceManager.useOauth2(YOUTUBE_TOKEN, true);
         //AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         audioPlayerManager.registerSourceManager(youtubeAudioSourceManager);
