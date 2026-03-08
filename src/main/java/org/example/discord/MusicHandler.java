@@ -1,4 +1,6 @@
 package org.example.discord;
+import club.minnced.discord.jdave.interop.JDaveSessionFactory;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -6,11 +8,16 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
+
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.audio.AudioModuleConfig;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
+
 import org.example.model.exceptions.UserNotInVoiceException;
 
 import java.util.List;
@@ -20,6 +27,7 @@ public class MusicHandler {
 
     public static final String BOT_ID = "1077005717996838912";
     public static final int QUEUE_PAGE_SIZE = 20;
+    public static final String YOUTUBE_TOKEN = "YOUTUBE_TOKEN";
 
     private AudioPlayerManager audioPlayerManager;
     private AudioManager audioManager;
@@ -30,13 +38,11 @@ public class MusicHandler {
         audioPlayerManager = new DefaultAudioPlayerManager();
         YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager();
         youtubeAudioSourceManager.useOauth2(YOUTUBE_TOKEN, true);
-        //AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         audioPlayerManager.registerSourceManager(youtubeAudioSourceManager);
         player = audioPlayerManager.createPlayer();
         trackScheduler = new TrackScheduler(player, this);
         player.addListener(trackScheduler);
     }
-
     public String joinVoice(SlashCommandInteractionEvent event) {
         VoiceChannel connectedChannel = event.getMember().getVoiceState().getChannel().asVoiceChannel();
         audioManager = event.getGuild().getAudioManager();

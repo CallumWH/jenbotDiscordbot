@@ -1,8 +1,10 @@
 package org.example;
 
+import club.minnced.discord.jdave.interop.JDaveSessionFactory;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.audio.AudioModuleConfig;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -22,6 +24,8 @@ public class Main {
         JDA jda = JDABuilder.createDefault(BOT_TOKEN)
                 .addEventListeners(new DiscordListener())
                 .setActivity(Activity.playing("Where the hell is J'arven?"))
+                .setAudioModuleConfig(new AudioModuleConfig()
+                        .withDaveSessionFactory(new JDaveSessionFactory()))
                 .build();
 
         // Sets the global command list to the provided commands (removing all others)

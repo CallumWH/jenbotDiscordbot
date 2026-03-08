@@ -20,6 +20,7 @@ public class DiscordListener extends ListenerAdapter {
 
     private MusicHandler musicHandler;
     private static final Logger logger = LoggerFactory.getLogger(DiscordListener.class);
+    public static final String BOT_TOKEN = "BOT_TOKEN";
     public DiscordListener() {
         musicHandler = new MusicHandler();
     }
